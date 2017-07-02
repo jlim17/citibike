@@ -4,6 +4,7 @@ citi2017March <- read.csv("citi201703.csv")
 hist(2017-citi2017March$Birth.Year, xlab="Approx Age", main="Distribution of Citibike Rider Age", breaks=68)
 
 # Identify missing values
+attach(citi2017March)
 missing_values <- function(data, variable, new_variable) {
   data$new_variable <- ifelse(is.na(variable),1,0)
   return(data$new_variable)
@@ -55,10 +56,41 @@ dist1$Status
 
 
 #using geosphere package
+library(geosphere)
+for(i in 1:length(citi2017March$Start.Station.Latitude)) {
+  mar17dist[i,1] <- distm(c(citi2017March$Start.Station.Latitude[i], citi2017March$Start.Station.Longitude[i]),
+                         c(citi2017March$End.Station.Latitude[i], citi2017March$End.Station.Longitude[i]), fun=distHaversine)
+}
+
 distm(c(40.71836, -74.03891), c(40.73760, -74.05248), fun=distHaversine)
 
 
+# UNIQUE
+uniqueID <- data.frame(matrix(ncol=2, nrow=29296-15084))
 
+for(i in 15084:29296) {
+  #uniqueID[i-15083,][1] = i
+}
+
+bikeIDGroup <- group_by(citi2017March, Bike.ID)
+bikeIDGroupMut <- mutate(bikeIDGroup, count=n())
+
+bikeIDGroupMutFilt <- subset(bikeIDGroupMut, !duplicated(bikeIDGroupMut$Bike.ID))
+
+uniqueBikeID <- bikeIDGroupMutFilt[c(12,16)]
+plot(uniqueBikeID$count, main="Number of rides on a Unique Bike")
+
+
+# Ok now gonna do it on the big set
+citi201703full <- read.csv("citi201703full.csv")
+
+bikeIDGroup1 <- group_by(citi201703full, Bike.ID)
+bikeIDGroupMut1 <- mutate(bikeIDGroup1, count=n())
+bikeIDGroupMutFilt1 <- subset(bikeIDGroupMut1, !duplicated(bikeIDGroupMut1$Bike.ID))
+uniqueBikeID1 <- bikeIDGroupMutFilt1[c(12,16)]
+
+plot(density(uniqueBikeID1$count))
+density(uniqueBikeID1$count)
 
 
 
